@@ -1,125 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { User } from '../types';
-import { Shield, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, CheckCircle2, AlertCircle, Sparkles, UserCheck } from 'lucide-react';
+import { Shield, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { dbSync as dbMock } from '../lib/dbSync';
 import { GoogleSignInModal } from './GoogleSignInModal';
-import { useClerk, useUser } from '@clerk/clerk-react';
-import { CLERK_PUBLISHABLE_KEY } from '../ClerkWrapper';
-import { buildCrmUserFromClerk, extractClerkRole, updateClerkUserRole, CrmRole } from '../lib/clerkRoleSync';
 
 interface AuthPageProps {
   onLoginSuccess: (user: User) => void;
-}
-
-function ClerkAuthButton({ onLoginSuccess }: { onLoginSuccess: (user: User) => void }) {
-  if (!CLERK_PUBLISHABLE_KEY) {
-    return (
-      <div className="p-3 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800/40 rounded-lg text-xs space-y-1">
-        <div className="flex items-center gap-1.5 font-bold text-indigo-700 dark:text-indigo-300">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Clerk Authentication Enabled</span>
-        </div>
-        <p className="text-[11px] text-zinc-600 dark:text-zinc-400">
-          Set <code className="bg-indigo-100 dark:bg-indigo-900/40 px-1 py-0.5 rounded font-mono text-[10px]">VITE_CLERK_PUBLISHABLE_KEY</code> in environment settings to enable live Clerk SSO & User Management.
-        </p>
-      </div>
-    );
-  }
-
-  return <ClerkAuthHandler onLoginSuccess={onLoginSuccess} />;
-}
-
-function ClerkAuthHandler({ onLoginSuccess }: { onLoginSuccess: (user: User) => void }) {
-  const clerk = useClerk();
-  const { user, isLoaded, isSignedIn } = useUser();
-  const [selectedRole, setSelectedRole] = useState<CrmRole | null>(null);
-
-  const activeRole: CrmRole = selectedRole || (user ? extractClerkRole(user) : 'office');
-
-  useEffect(() => {
-    if (isLoaded && isSignedIn && user) {
-      const crmUser = buildCrmUserFromClerk(user, activeRole);
-      onLoginSuccess(crmUser);
-    }
-  }, [isLoaded, isSignedIn, user, activeRole, onLoginSuccess]);
-
-  const handleRoleChange = async (newRole: CrmRole) => {
-    setSelectedRole(newRole);
-    if (user) {
-      await updateClerkUserRole(user, newRole);
-      const updatedUser = buildCrmUserFromClerk(user, newRole);
-      onLoginSuccess(updatedUser);
-    }
-  };
-
-  if (isLoaded && isSignedIn && user) {
-    return (
-      <div className="p-4 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 rounded-xl space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
-              {user.firstName?.[0] || 'C'}
-            </div>
-            <div>
-              <div className="text-xs font-bold text-ink">{user.fullName || user.firstName}</div>
-              <div className="text-[10px] text-mut">{user.primaryEmailAddress?.emailAddress}</div>
-            </div>
-          </div>
-          <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700">
-            {activeRole.toUpperCase()}
-          </span>
-        </div>
-
-        {/* Role Sync Selector */}
-        <div className="space-y-1.5 pt-1 border-t border-indigo-200/60 dark:border-indigo-800/50">
-          <label className="text-[10px] font-bold uppercase tracking-wider text-mut block">
-            Clerk Role Sync (Metadata):
-          </label>
-          <div className="grid grid-cols-4 gap-1">
-            {(['owner', 'office', 'factory', 'installer'] as CrmRole[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                onClick={() => handleRoleChange(r)}
-                className={`py-1 text-[10px] font-bold rounded-lg capitalize transition-all cursor-pointer ${
-                  activeRole === r
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-white/80 dark:bg-zinc-800/80 text-ink hover:bg-indigo-100 dark:hover:bg-indigo-900/30'
-                }`}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            const crmUser = buildCrmUserFromClerk(user, activeRole);
-            onLoginSuccess(crmUser);
-          }}
-          className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
-        >
-          <UserCheck className="w-3.5 h-3.5" />
-          Continue to CRM as {activeRole.toUpperCase()}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      <button
-        type="button"
-        onClick={() => clerk.openSignIn()}
-        className="w-full flex items-center justify-center gap-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider px-4 py-3 rounded-lg shadow-sm transition-all cursor-pointer"
-      >
-        <UserCheck className="w-4 h-4" />
-        Sign in with Clerk Auth
-      </button>
-    </div>
-  );
 }
 
 export function AuthPage({ onLoginSuccess }: AuthPageProps) {
@@ -311,9 +197,6 @@ export function AuthPage({ onLoginSuccess }: AuthPageProps) {
         {view === 'login' && (
           <>
             <div className="space-y-3">
-              {/* Clerk Auth Integration */}
-              <ClerkAuthButton onLoginSuccess={onLoginSuccess} />
-
               {/* Google SSO integration */}
               <button
                 type="button"

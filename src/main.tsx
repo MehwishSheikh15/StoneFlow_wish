@@ -1,7 +1,6 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
-import { ClerkWrapper } from './ClerkWrapper.tsx';
 import './index.css';
 
 // Safely handle and silence benign HMR and WebSocket errors in the developer environment
@@ -40,9 +39,7 @@ if (typeof window !== 'undefined') {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkWrapper>
-      <App />
-    </ClerkWrapper>
+    <App />
   </StrictMode>,
 );
 

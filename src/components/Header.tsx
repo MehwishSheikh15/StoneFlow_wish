@@ -464,7 +464,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {/* Switch Active Role / Profile */}
                   <div className="pt-2 border-t border-line/60">
                     <label className="block text-[9px] font-extrabold uppercase tracking-wider text-mut mb-1">
-                      {currentUser.id.startsWith('clerk-') ? 'Clerk Synced Role Role:' : 'Switch Role View:'}
+                      Switch Role View:
                     </label>
                     <div className="grid grid-cols-4 gap-1">
                       {(['owner', 'office', 'factory', 'installer'] as const).map((role) => (

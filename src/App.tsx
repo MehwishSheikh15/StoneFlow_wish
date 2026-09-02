@@ -16,7 +16,6 @@ import { TeamManagement } from './components/TeamManagement';
 import { QRModal } from './components/QRModal';
 import { PhotoUploadModal } from './components/PhotoUploadModal';
 import { QuickEditMaterialModal } from './components/QuickEditMaterialModal';
-import { ClerkRoleSyncObserver } from './components/ClerkRoleSyncObserver';
 import { dbSync as dbMock, MOCK_USERS } from './lib/dbSync';
 import { User, Job, OffCut } from './types';
 import { Bell, Sparkles, CheckCircle2, AlertTriangle, X, Lock, Database, Copy, Plus, QrCode, Package, Scissors, Layers, MapPin, Maximize2, CalendarX, LayoutDashboard, ListTodo, ClipboardCheck, Trash2 } from 'lucide-react';
@@ -408,30 +407,6 @@ export default function App() {
       setCurrentPage('dashboard');
     }
     triggerToast(`Switched active profile to ${user.name} (${user.role.toUpperCase()})`);
-  };
-
-  const handleClerkRoleSync = (syncedUser: User) => {
-    setCurrentUser(syncedUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('stoneflow_authenticated', 'true');
-    localStorage.setItem('stoneflow_user', JSON.stringify(syncedUser));
-
-    if (syncedUser.role === 'factory') {
-      setWorkspace('factory');
-      if (!['cutting-queue', 'qc-station', 'materials'].includes(currentPage)) {
-        setCurrentPage('cutting-queue');
-      }
-    } else if (syncedUser.role === 'installer') {
-      setWorkspace('factory');
-      if (currentPage !== 'installations') {
-        setCurrentPage('installations');
-      }
-    } else if (syncedUser.role === 'office') {
-      setWorkspace('office');
-      if (['cutting-queue', 'qc-station', 'team', 'warnings', 'billing-closed'].includes(currentPage)) {
-        setCurrentPage('dashboard');
-      }
-    }
   };
 
   const handleLoginSuccess = (user: User) => {
@@ -1231,7 +1206,6 @@ export default function App() {
           '--scrollbar-hover-color': scrollbarColors.hover
         } as React.CSSProperties}
       >
-        <ClerkRoleSyncObserver currentUser={currentUser} onSyncUser={handleClerkRoleSync} />
         <AuthPage onLoginSuccess={handleLoginSuccess} />
       </div>
     );
@@ -1245,7 +1219,6 @@ export default function App() {
         '--scrollbar-hover-color': scrollbarColors.hover
       } as React.CSSProperties}
     >
-      <ClerkRoleSyncObserver currentUser={currentUser} onSyncUser={handleClerkRoleSync} />
       <div className="app">
         {/* Sidebar: Desktop */}
         <div className="hidden md:block h-screen sticky top-0 flex-shrink-0 z-40">
