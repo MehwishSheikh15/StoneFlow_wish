@@ -1,0 +1,6 @@
+{
+  "name": "StoneFlow CRM",
+  "description": "High-performance job-tracking workspace for stone & marble fabrication companies with a 17-stage workflow, approval gates, automatic warning rules, and dual office/factory views.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

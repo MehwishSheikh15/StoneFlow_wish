@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stoneflow-config
+  namespace: stoneflow
+  labels:
+    app: stoneflow
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  DATA_DIR: "/app/data"
+  LOG_LEVEL: "info"
